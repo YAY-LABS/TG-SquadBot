@@ -6,7 +6,7 @@ import { adminBot } from '../modules/Bot';
 import { getUserModel } from '../db/models/user';
 import { getSquadModel } from '../db/models/squad';
 import { findSquads, createSquad, updateSquad } from '../modules/Squad';
-import { findUser, updateUser } from '../modules/User';
+import { createUser, findUser, updateUser } from '../modules/User';
 
 const router = express.Router();
 
@@ -29,6 +29,22 @@ router.get('/chat', async (req, res) => {
     });
 });
 
+router.post('/user', async (req, res) => {
+  const token = req.headers.authorization as string;
+  const { userId } = req.body;
+  const dbName = token.split(':')[0];
+
+  try {
+    const dbConnection = await connectDatabase(dbName);
+    const UserModel = getUserModel(dbConnection);
+    const user = await createUser(UserModel, +userId);
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
 router.get('/user/:userId', async (req, res) => {
   const token = req.headers.authorization as string;
   const { userId } = req.params;
@@ -44,9 +60,6 @@ router.get('/user/:userId', async (req, res) => {
     const dbConnection = await connectDatabase(dbName);
     const UserModel = getUserModel(dbConnection);
     const user = await findUser(UserModel, +userId);
-    if (!user) {
-      return res.status(500).json({ message: 'You are not a user' });
-    }
     res.status(200).json(user);
   } catch (error) {
     console.log(error);

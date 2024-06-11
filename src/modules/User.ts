@@ -1,6 +1,28 @@
 import mongoose, { Model } from 'mongoose';
 import { IUser } from '../db/models/user';
 
+export async function createUser(
+  UserModel: Model<IUser>,
+  userId: number
+): Promise<any> {
+  try {
+    const user = await new UserModel({ userId, score: 0 }).save();
+    console.log('create user', user);
+    return user;
+  } catch (error) {
+    console.error({ error });
+    if (error instanceof mongoose.Error) {
+      throw {
+        message: 'An error occurred while creating the user',
+      };
+    } else {
+      throw {
+        message: 'A network error has occurred.',
+      };
+    }
+  }
+}
+
 export async function findUser(
   UserModel: Model<IUser>,
   userId: number
