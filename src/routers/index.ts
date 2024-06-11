@@ -82,7 +82,7 @@ router.get('/squads', async (req, res) => {
   }
 });
 
-router.get('/squad/:squadId', async (req, res) => {
+router.get('/squads/:squadId', async (req, res) => {
   const token = req.headers.authorization as string;
   const { squadId } = req.params;
   const dbName = token.split(':')[0];
@@ -101,6 +101,29 @@ router.get('/squad/:squadId', async (req, res) => {
       return res.status(500).json({ message: `Can't find squad` });
     }
     res.status(200).json(squad[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
+// 유저 스코어 업데이트 및 조회
+router.post('/squads/:userId', async (req, res) => {
+  const token = req.headers.authorization as string;
+  const { userId } = req.params;
+  const { score } = req.body;
+  try {
+    const dbName = token.split(':')[0];
+    const dbConnection = await connectDatabase(dbName);
+    const UserModel = getUserModel(dbConnection);
+    const updatedUser = await updateUser(UserModel, +userId, {
+      $set: { score },
+    });
+
+    if (!updatedUser) {
+      throw { message: 'User not found' };
+    }
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -222,27 +245,6 @@ router.post('/leave-squad', async (req, res) => {
     const updatedUser = await updateUser(UserModel, userId, {
       $set: { squad: null },
     });
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-});
-
-router.post('/score', async (req, res) => {
-  const token = req.headers.authorization as string;
-  const { userId, score } = req.body;
-  try {
-    const dbName = token.split(':')[0];
-    const dbConnection = await connectDatabase(dbName);
-    const UserModel = getUserModel(dbConnection);
-    const updatedUser = await updateUser(UserModel, userId, {
-      $set: { score },
-    });
-
-    if (!updatedUser) {
-      throw { message: 'User not found' };
-    }
     res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
