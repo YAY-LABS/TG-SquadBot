@@ -70,12 +70,19 @@ router.get('/user/:userId', async (req, res) => {
 router.get('/squads', async (req, res) => {
   const token = req.headers.authorization as string;
   const dbName = token.split(':')[0];
-  console.log('dbName', dbName);
+  const { sortBy } = req.query;
+  console.log('get squads dbName sortBy', dbName, sortBy);
   try {
     const dbConnection = await connectDatabase(dbName);
     const SquadModel = getSquadModel(dbConnection);
-    const squads = await findSquads(SquadModel, {});
-    res.status(200).json(squads);
+
+    if (typeof sortBy === 'string') {
+      const squads = await findSquads(SquadModel, {}, sortBy);
+      res.status(200).json(squads);
+    } else {
+      const squads = await findSquads(SquadModel, {});
+      res.status(200).json(squads);
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
