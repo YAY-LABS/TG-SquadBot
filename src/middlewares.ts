@@ -24,10 +24,9 @@ export function errorHandler(
   });
 }
 
-const SECRET_TOKENS = [
-  process.env.TELEGRAM_BOT_TOKEN as string,
-  process.env.TELEGRAM_BOT_TOKEN_2 as string,
-];
+const SECRET_TOKENS = Object.keys(process.env)
+  .filter((key) => key.startsWith('TELEGRAM_BOT_TOKEN'))
+  .map((key) => process.env[key] as string);
 
 export function tokenFilterMiddleware(
   req: Request,
@@ -35,7 +34,6 @@ export function tokenFilterMiddleware(
   next: NextFunction
 ) {
   const token: string | undefined = req.headers.authorization;
-
   if (!token || !SECRET_TOKENS.includes(token)) {
     return res.status(401).send('Access Denied: Invalid Token');
   }
