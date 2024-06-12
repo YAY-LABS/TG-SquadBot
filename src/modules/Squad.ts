@@ -62,7 +62,9 @@ export async function updateSquad(
   updateData: any
 ): Promise<any> {
   try {
-    const squad = await SquadModel.findOneAndUpdate({ username }, updateData);
+    const squad = await SquadModel.findOneAndUpdate({ username }, updateData, {
+      new: true,
+    });
     console.log({ squad });
     return squad;
   } catch (error: any) {

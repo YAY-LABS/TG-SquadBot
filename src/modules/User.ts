@@ -55,7 +55,9 @@ export async function updateUser(
   updateData: any
 ): Promise<any> {
   try {
-    const user = await UserModel.findOneAndUpdate({ userId }, updateData);
+    const user = await UserModel.findOneAndUpdate({ userId }, updateData, {
+      new: true,
+    });
     console.log('update user', user);
     return user;
   } catch (error) {
