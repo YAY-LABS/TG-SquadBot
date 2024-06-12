@@ -3,7 +3,7 @@ import { IUser } from '../db/models/user';
 
 export async function createUser(
   UserModel: Model<IUser>,
-  userId: number
+  userId: string
 ): Promise<any> {
   try {
     const user = await new UserModel({ userId, score: 0 }).save();
@@ -25,7 +25,7 @@ export async function createUser(
 
 export async function findUser(
   UserModel: Model<IUser>,
-  userId: number
+  userId: string
 ): Promise<any> {
   try {
     const user = await UserModel.findOne({ userId });
@@ -51,7 +51,7 @@ export async function findUser(
 
 export async function updateUser(
   UserModel: Model<IUser>,
-  userId: number,
+  userId: string,
   updateData: any
 ): Promise<any> {
   try {

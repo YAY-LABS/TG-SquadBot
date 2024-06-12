@@ -3,6 +3,6 @@ export type CreateSquadBody = {
   username: string;
   title: string;
   shareLink: string;
-  userId: number;
+  userId: string;
   photo: string;
 };

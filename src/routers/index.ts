@@ -37,7 +37,7 @@ router.post('/user', async (req, res) => {
   try {
     const dbConnection = await connectDatabase(dbName);
     const UserModel = getUserModel(dbConnection);
-    const user = await createUser(UserModel, +userId);
+    const user = await createUser(UserModel, userId);
     res.status(200).json(user);
   } catch (error) {
     console.log(error);
@@ -59,7 +59,7 @@ router.get('/user/:userId', async (req, res) => {
   try {
     const dbConnection = await connectDatabase(dbName);
     const UserModel = getUserModel(dbConnection);
-    const user = await findUser(UserModel, +userId);
+    const user = await findUser(UserModel, userId);
     res.status(200).json(user);
   } catch (error) {
     console.log(error);
@@ -116,13 +116,13 @@ router.post('/squads/:userId', async (req, res) => {
     const dbName = token.split(':')[0];
     const dbConnection = await connectDatabase(dbName);
     const UserModel = getUserModel(dbConnection);
-    const updatedUser = await updateUser(UserModel, +userId, {
+    const existingUser = await findUser(UserModel, userId);
+    if (!existingUser) {
+      await createUser(UserModel, userId);
+    }
+    const updatedUser = await updateUser(UserModel, userId, {
       $set: { score },
     });
-
-    if (!updatedUser) {
-      throw { message: 'User not found' };
-    }
     res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
